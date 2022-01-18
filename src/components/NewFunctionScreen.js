@@ -1,30 +1,95 @@
 import React, { useState } from 'react';
-import { Card } from 'react-bootstrap'
-import Swal from 'sweetalert2';
+import NewFunctionForm from './NewFunctionForm';
 import { NewCategory } from '../components/ModalCategory/NewCategory'
 import { useForm } from '../hooks/useForm';
+import { Card } from 'react-bootstrap'
+import Swal from 'sweetalert2';
 import '../styles/function.css';
-import NewFunctionForm from './NewFunctionForm';
 
 
-const BASEURL = 'http://localhost:8080/api/functions'
+const BASEURL = 'http://localhost:8080/api/function'
 
 const NewFunctionScreen = () => {
 
     const [ show, setShow ] = useState(false);
+
+    const [validator, setValidator] = useState({})
         
-    const [ formValues, handleInputChange ] = useForm({
+    const [ formValues, handleInputChange, reset ] = useForm({
         nombreFuncion: '',
         descripcion: '',
         codigoFuncion: '',
-        idCategoria: "0"
+        idCategoria: ''
     });
+
+    const validate = () => {
+        let errorNameFunct = "";
+        let errorDescFunct = "";
+        let errorCodeFunct = "";
+        let errorCateFunct = "";
+        (!formValues.nombreFuncion) && (errorNameFunct = "El nombre de la función es requerido");
+        (!formValues.descripcion  ) && (errorDescFunct = "La descripción de la función es requerido");
+        (!formValues.codigoFuncion) && (errorCodeFunct = "El código de la función es requerido");
+        (!formValues.idCategoria  ) && (errorCateFunct = "La categoría de la función es requerido");
+
+        if (errorNameFunct || errorDescFunct || errorCodeFunct || errorCateFunct) {
+            
+            setValidator({errorNameFunct, errorDescFunct, errorCodeFunct, errorCateFunct});
+            return true; 
+        };
+        return false;
+    }
 
     
     const handleSubmit = ( e ) => {
         e.preventDefault();
-        console.log( formValues )
-        //Fetch al guardar función
+
+        if(validate()){
+            return;
+            
+        }else{
+
+            try {
+                eval(formValues.codigoFuncion);
+                
+                fetch( BASEURL ,  {
+                    method: 'POST',
+                    body: JSON.stringify(formValues),
+                    headers: {
+                        'Content-Type' : 'application/json',
+                        'x-token' : JSON.parse( localStorage.getItem('token') ) || ''   
+                    }
+                })
+                .then(data => data.json())
+                .then(( { code, content } ) => {
+                        if(code === 200){
+                            Swal.fire({
+                                text: `Funcion "${formValues.nombreFuncion}" creada.`,
+                                icon: 'success',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                            setValidator({});
+                            reset();
+                            return;
+                        }
+                })
+                .catch(console.warn);
+
+            } catch (error) {
+                Swal.fire({
+                    title: 'Upps...',
+                    text : `Revisa tu función, tiene un error sintáctico.`,
+                    icon : 'warning',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                console.log(error);
+                
+            }
+
+        }
+
     };
 
     const handleModalSubmit = async ( e ) => {
@@ -90,10 +155,11 @@ const NewFunctionScreen = () => {
             />
 
             <NewFunctionForm 
-                handleShowModal = { handleShowModal }
-                formValues = { formValues }
-                handleSubmit = { handleSubmit }
-                handleInputChange={ handleInputChange }
+                handleShowModal   = { handleShowModal }
+                formValues        = { formValues }
+                handleSubmit      = { handleSubmit }
+                handleInputChange = { handleInputChange }
+                validator         = { validator }
             />
 
             </Card.Body>
