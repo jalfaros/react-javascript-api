@@ -1,10 +1,18 @@
-import React from 'react';
-import { Card, Button } from 'react-bootstrap'
+import React, { useState } from 'react';
+import { Card } from 'react-bootstrap'
+import Swal from 'sweetalert2';
+import { NewCategory } from '../components/ModalCategory/NewCategory'
 import { useForm } from '../hooks/useForm';
 import '../styles/function.css';
+import NewFunctionForm from './NewFunctionForm';
+
+
+const BASEURL = 'http://localhost:8080/api/functions'
 
 const NewFunctionScreen = () => {
 
+    const [ show, setShow ] = useState(false);
+        
     const [ formValues, handleInputChange ] = useForm({
         nombreFuncion: '',
         descripcion: '',
@@ -12,75 +20,81 @@ const NewFunctionScreen = () => {
         idCategoria: "0"
     });
 
-    const { nombreFuncion, descripcion, codigoFuncion, idCategoria } = formValues;
-
+    
     const handleSubmit = ( e ) => {
         e.preventDefault();
-
         console.log( formValues )
+        //Fetch al guardar función
     };
 
-    // useEffect(() => {
-    //     console.log('ejecución')
-    //     try {
-    //         eval( codigoFuncion )
-    //     }catch( err ){
-    //         console.log( err )
-    //     }
-    // }, [codigoFuncion])
+    const handleModalSubmit = async ( e ) => {
+
+        e.preventDefault();
+
+        try{
+            let response = await fetch( BASEURL + '/newCategory',  {
+                method: 'POST',
+                body: JSON.stringify({nombreCategoria: e.target[0].value }),
+                headers: {
+                    'Content-Type' : 'application/json',
+                    'x-token' : JSON.parse( localStorage.getItem('token') ) || ''   
+                }
+            });
+
+            handleFetchModal( await response.json() );
+
+        }catch( err ){
+            console.log( err )
+        }
+    };
+
+    const handleFetchModal = ( response ) => {
+
+        if ( response.code !== 200 ){
+
+            const { content } = response;
+
+            Swal.fire({
+                icon: 'error',
+                text: content.errors[1],
+                timer: 1500,
+                showConfirmButton: false
+            });
+            return;
+        };
+        // Categorías propias del usuario, se deben de devolver todas las del id correspondiente
+        setShow( !show )
+    };
+
+
+    const handleShowModal = () => {
+        setShow( !show )
+    };
 
 
     return (
+        
         <Card>
             <Card.Title className='text-center' style={{ marginTop: '10px' }}>
                 Nueva función
             </Card.Title>
             <hr />
             <Card.Body>
+
+            <NewCategory  
+                show = { show }
+                setShow = { setShow }
+                handleModalSubmit={ handleModalSubmit }
                 
-            <form className = "formFlex" onSubmit={ handleSubmit } autoComplete='off'>
+                
+            />
 
-                <label htmlFor="nombreFuncion">Nombre</label>
-                <input  type="text" 
-                        name = "nombreFuncion"
-                        id = "nombreFuncion"
-                        placeholder='Fibonacci...'
-                        onChange={ handleInputChange }
-                        value = { nombreFuncion }
-                />
-
-                <label htmlFor="descripcion">Descripción<span>*</span></label>
-                <input  type="text" 
-                        name = "descripcion"
-                        id = "descipcion"
-                        placeholder='Recursiva...'
-                        required
-                        onChange={ handleInputChange }
-                        value = { descripcion }
-                />
-
-                <label htmlFor="idCategoria">Categoría<span>*</span></label>
-
-                <select name="idCategoria" id="idCategoria" required onChange={handleInputChange} value = { idCategoria }>
-
-                </select>
-
-                <label htmlFor="codigoFuncion">Código<span>*</span></label>
-                <textarea   name="codigoFuncion" 
-                            id="codigoFuncion" 
-                            cols="5" 
-                            rows="5" 
-                            required
-                            onChange={ handleInputChange }
-                            value = { codigoFuncion }
-                />
-
-
-                <Button variant="outline-primary" type="submit"> 
-                    <i className="far fa-save"></i>
-                </Button>
-
-            </form>
+            <NewFunctionForm 
+                handleShowModal = { handleShowModal }
+                formValues = { formValues }
+                handleSubmit = { handleSubmit }
+                handleInputChange={ handleInputChange }
+            />
 
             </Card.Body>
         </Card>
