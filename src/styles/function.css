@@ -1,0 +1,35 @@
+
+
+
+.card{
+    width: 90%;
+    box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0);
+}
+
+
+.formFlex{
+    display: grid; 
+    grid-template-columns: 200px 200px;
+    justify-content: space-around;
+    row-gap: 1rem;
+}
+
+.formFlex span {
+    color: red
+}
+
+.btn {
+    grid-column: 2/3;
+}
+
+@media screen and (max-width: 499px){
+
+    .formFlex{
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card {
+        width: 100%;
+    }
+}
