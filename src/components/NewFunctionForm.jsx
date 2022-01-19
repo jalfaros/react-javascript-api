@@ -84,7 +84,6 @@ const NewFunctionForm = ({ formValues,handleInputChange,handleSubmit,handleShowM
                 <label htmlFor="codigoFuncion">Código</label>
                 <textarea   name="codigoFuncion" 
                             id="codigoFuncion" 
-                            // cols="5" 
                             rows="7" 
                             className='linedTextArea'
                             onChange={ handleInputChange }

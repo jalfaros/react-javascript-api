@@ -7,7 +7,7 @@ import Swal from 'sweetalert2';
 import '../styles/function.css';
 
 
-const BASEURL = 'http://localhost:8080/api/function'
+const BASEURL = 'http://localhost:8080/api/'
 
 const NewFunctionScreen = () => {
 
@@ -52,7 +52,7 @@ const NewFunctionScreen = () => {
             try {
                 eval(formValues.codigoFuncion);
                 
-                fetch( BASEURL ,  {
+                fetch( BASEURL + 'function' ,  {
                     method: 'POST',
                     body: JSON.stringify(formValues),
                     headers: {
@@ -61,7 +61,7 @@ const NewFunctionScreen = () => {
                     }
                 })
                 .then(data => data.json())
-                .then(( { code, content } ) => {
+                .then(( { code } ) => {
                         if(code === 200){
                             Swal.fire({
                                 text: `Funcion "${formValues.nombreFuncion}" creada.`,
@@ -97,7 +97,7 @@ const NewFunctionScreen = () => {
         e.preventDefault();
 
         try{
-            let response = await fetch( BASEURL + '/newCategory',  {
+            let response = await fetch( BASEURL + 'category',  {
                 method: 'POST',
                 body: JSON.stringify({nombreCategoria: e.target[0].value }),
                 headers: {
