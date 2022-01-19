@@ -14,6 +14,7 @@ const NewFunctionScreen = () => {
     const [ show, setShow ] = useState(false);
 
     const [validator, setValidator] = useState({})
+    const [categorys, setCategorys] = useState([]);
         
     const [ formValues, handleInputChange, reset ] = useForm({
         nombreFuncion: '',
@@ -50,9 +51,12 @@ const NewFunctionScreen = () => {
         }else{
 
             try {
-                eval(formValues.codigoFuncion);
+                const func = eval(`( ${formValues.codigoFuncion})`);
+                if( typeof func !== 'function' ) throw new Error('No it is a function.');
                 
-                fetch( BASEURL + 'function' ,  {
+                console.log('Hola mundo');
+                
+                fetch( `${BASEURL}function` ,  {
                     method: 'POST',
                     body: JSON.stringify(formValues),
                     headers: {
@@ -97,7 +101,7 @@ const NewFunctionScreen = () => {
         e.preventDefault();
 
         try{
-            let response = await fetch( BASEURL + 'category',  {
+            let response = await fetch(  `${BASEURL}category` ,  {
                 method: 'POST',
                 body: JSON.stringify({nombreCategoria: e.target[0].value }),
                 headers: {
@@ -113,11 +117,9 @@ const NewFunctionScreen = () => {
         }
     };
 
-    const handleFetchModal = ( response ) => {
+    const handleFetchModal = ( {code, content = ''} ) => {
 
-        if ( response.code !== 200 ){
-
-            const { content } = response;
+        if ( code !== 200 ){
 
             Swal.fire({
                 icon: 'error',
@@ -127,6 +129,8 @@ const NewFunctionScreen = () => {
             });
             return;
         };
+        setCategorys([...categorys, content[0]]);
+        
         // Categorías propias del usuario, se deben de devolver todas las del id correspondiente
         setShow( !show )
     };
@@ -155,11 +159,13 @@ const NewFunctionScreen = () => {
             />
 
             <NewFunctionForm 
-                handleShowModal   = { handleShowModal }
-                formValues        = { formValues }
-                handleSubmit      = { handleSubmit }
+                handleShowModal   = { handleShowModal   }
+                formValues        = { formValues        }
+                handleSubmit      = { handleSubmit      }
                 handleInputChange = { handleInputChange }
-                validator         = { validator }
+                validator         = { validator         }
+                categorys         = { categorys         }
+                setCategorys      = { setCategorys      }
             />
 
             </Card.Body>

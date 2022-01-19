@@ -4,12 +4,10 @@ import '../styles/function.css';
 
 
 const BASEURL = 'http://localhost:8080/api/category';
-const NewFunctionForm = ({ formValues,handleInputChange,handleSubmit,handleShowModal, validator }) => {
+const NewFunctionForm = ({ formValues,handleInputChange,handleSubmit,handleShowModal, validator, categorys, setCategorys }) => {
 
     const { nombreFuncion, descripcion, codigoFuncion, idCategoria } = formValues;
     
-    const [categorys, setCategorys] = useState([]);
-
     const getCategorys = () =>{
 
         fetch(BASEURL, {method: 'get', headers: {'Content-Type' : 'application/json','x-token': JSON.parse(localStorage.getItem('token')) } })
