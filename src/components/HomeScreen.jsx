@@ -19,15 +19,12 @@ const HomeScreen = (  ) => {
             <NavBar username = { userName } />
 
             <div className="boxContainer">
-
-                <NewFunctionScreen 
-                
-                />
-
-                <SearchFunctionScreen 
-                
-                />
+                <NewFunctionScreen />
+                <SearchFunctionScreen />
             </div>
+
+        
+            
 
         </>
     )

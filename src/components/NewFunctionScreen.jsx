@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import NewFunctionForm from './NewFunctionForm';
-import { NewCategory } from '../components/ModalCategory/NewCategory'
+import { NewCategory } from './ModalCategory/NewCategory'
 import { useForm } from '../hooks/useForm';
 import { Card } from 'react-bootstrap'
 import Swal from 'sweetalert2';
 import '../styles/function.css';
-
 
 const BASEURL = 'http://localhost:8080/api/'
 
@@ -51,11 +50,10 @@ const NewFunctionScreen = () => {
         }else{
 
             try {
-                const func = eval(`( ${formValues.codigoFuncion})`);
-                if( typeof func !== 'function' ) throw new Error('No it is a function.');
+                const func = eval(`( ${formValues.codigoFuncion})`);                
+                if( typeof func !== 'function' ) throw new Error('No estás declarando una función');
                 
-                console.log('Hola mundo');
-                
+            
                 fetch( `${BASEURL}function` ,  {
                     method: 'POST',
                     body: JSON.stringify(formValues),
@@ -80,16 +78,14 @@ const NewFunctionScreen = () => {
                 })
                 .catch(console.warn);
 
-            } catch (error) {
+            } catch (err) {
                 Swal.fire({
                     title: 'Upps...',
-                    text : `Revisa tu función, tiene un error sintáctico.`,
+                    text : 'Errores sintácticos o no está declarando una función',
                     icon : 'warning',
-                    timer: 2000,
+                    timer: 1500,
                     showConfirmButton: false
-                });
-                console.log(error);
-                
+                });    
             }
 
         }
