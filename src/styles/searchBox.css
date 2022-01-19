@@ -1,0 +1,22 @@
+
+
+
+.searchBox{
+    display: grid;
+    grid-template-columns: 100%;
+    margin: 5px;
+}
+
+input, select {
+    border: 1px solid;
+    border-radius: 10px;
+}
+
+.functionContainer {
+    border: 1px solid red;
+    margin: 20px;
+    max-width: 400px;
+    justify-content: center;
+}
+
+

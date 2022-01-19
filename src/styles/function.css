@@ -1,5 +1,18 @@
 
+/* obtained from https://wisej.com/support/question/textarea-with-line-numbers */
 
+.linedTextArea {
+    background: url(http://i.imgur.com/2cOaJ.png);
+    background-color: #222f3b;
+    background-attachment: local;
+    background-repeat: no-repeat;
+    color: white;
+    padding-left: 35px;
+    padding-top: 10px;
+    border-color: #2f3e4e;
+    font-size: 11px;
+    font-family: monospace;
+  }
 
 .card{
     border-radius: 1rem;
@@ -19,9 +32,6 @@
     color: red
 }
 
-/* .btn {
-    grid-column: 2/3;
-} */
 
 @media screen and (max-width: 499px){
 
