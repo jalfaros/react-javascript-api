@@ -38,8 +38,8 @@ const NewFunctionScreen = () => {
             swalAlert(`Función "${ formValues.nombreFuncion }" creada correctamente`, 'success')
 
 
-        }catch( evalErr ){
-
+        }catch( err ){
+            console.log( err )
             swalAlert('Errores sintácticos de la función o no estás declarando una!', 'warning')
         }        
     };
