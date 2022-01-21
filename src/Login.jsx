@@ -1,9 +1,10 @@
 import React from 'react';
-import './styles/login.css';
 import { Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useForm } from './hooks/useForm';
-import Swal from 'sweetalert2'
+import { authLogin } from './components/services/authService'
+import { swalAlert } from './components/services/swalAlert';
+import './styles/login.css';
  
 
 export function Login() {
@@ -17,38 +18,24 @@ export function Login() {
 
   
     const handleLogin = async ( e ) => {
+
         e.preventDefault();
 
-        const response = await fetch( 'http://localhost:8080/api/auth/login',{
-            method: 'POST',
-            body: JSON.stringify( formValues ),
-            headers: {
-                'Content-Type' :'application/json'
-            }
-        });
-        
-        handleFetchInfo( await response.json() )
-    }
-
-
-    const handleFetchInfo = ( { code, content, token = '' } ) => {
+        const { code, content, token = '' } =  await authLogin( { formValues } );
         
         if( code !== 200 ){
-            Swal.fire({
-                text: 'Usuario o contraseña incorrecta',
-                icon: 'error',
-                timer: 1500,
-                showConfirmButton: false
-            })
+            swalAlert('Usuario o contraseña incorrecta', 'error'); 
             return;
         }
+
+        // Mejorar la administración de esto
 
         localStorage.setItem('isLogged', JSON.stringify(true));
         localStorage.setItem('content', JSON.stringify( content ));
         localStorage.setItem('token', JSON.stringify( token ));
         window.location.replace('/');
-    };
-
+        
+    }
 
 
     return (    

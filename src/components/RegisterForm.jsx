@@ -2,9 +2,10 @@ import React from 'react';
 import { Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useForm } from '../hooks/useForm';
-
+import { authNewUser } from './services/authService';
+import { swalAlert } from './services/swalAlert';
 import '../styles/login.css'
-import Swal from 'sweetalert2'
+
 
 const RegisterForm = () => {
 
@@ -17,53 +18,25 @@ const RegisterForm = () => {
 
     const { userName, pass, firstName, lastName } = values;
 
-    const handleSubmit = async ( e ) => {
+    const handleSubmit = async ( e ) => {        
         e.preventDefault();
+        
+        const { code, content, token = '' } = await authNewUser( { values } );
 
-        try {
-            const response = await fetch( 'http://localhost:8080/api/users', {
-                method: 'POST',
-                body: JSON.stringify( values ),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            handleFetchInfo( await response.json() ); 
-
-        }catch( error ){
-            console.log('Error: ', error)
-        }
-    };
-
-    const handleFetchInfo = ( { code, content, token = '' } ) => {
-
-        // Se encadena distinto, se debe de revisar la encadenación del success porque deja pasar al home sin credenciales
-    
         if ( code === 500 ){
-            Swal.fire({
-                text: 'Este usuario ya se encuentra registrado',
-                icon: 'error',
-                timer: 1000,
-                showConfirmButton: false
-            })
-        }else{
-
-            localStorage.setItem('content', JSON.stringify( content ));
-            localStorage.setItem('isLogged', JSON.stringify( true ));
-            localStorage.setItem('token', JSON.stringify( token ));
-            Swal.fire({
-                text: 'Usuario registrado correctamente',
-                icon: 'success',
-                timer: 1000,
-                showConfirmButton: false
-            });
-            
-            window.location.reload()
-  
+            swalAlert( 'Este usuario ya se encuentra registrado', 'error')
+            return;
         }
-    
-    }
+
+        localStorage.setItem('content', JSON.stringify( content ));
+        localStorage.setItem('isLogged', JSON.stringify( true ));
+        localStorage.setItem('token', JSON.stringify( token ));
+
+        swalAlert ('Usuario registrado correctamente', 'success')
+        
+        window.location.replace('/')
+        
+    };
 
   
     return (

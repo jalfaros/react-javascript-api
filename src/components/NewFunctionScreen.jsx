@@ -3,138 +3,67 @@ import NewFunctionForm from './NewFunctionForm';
 import { NewCategory } from './ModalCategory/NewCategory'
 import { useForm } from '../hooks/useForm';
 import { Card } from 'react-bootstrap'
-import Swal from 'sweetalert2';
+import { postFunction, postNewCategory } from './services/modal';
+import { swalAlert } from './services/swalAlert';
 import '../styles/function.css';
 
-const BASEURL = 'http://localhost:8080/api/'
 
 const NewFunctionScreen = () => {
 
     const [ show, setShow ] = useState(false);
 
-    const [validator, setValidator] = useState({})
     const [categorys, setCategorys] = useState([]);
         
-    const [ formValues, handleInputChange, reset ] = useForm({
+    const [ formValues, handleInputChange ] = useForm({
         nombreFuncion: '',
         descripcion: '',
         codigoFuncion: '',
         idCategoria: ''
     });
 
-    const validate = () => {
-        let errorNameFunct = "";
-        let errorDescFunct = "";
-        let errorCodeFunct = "";
-        let errorCateFunct = "";
-        (!formValues.nombreFuncion) && (errorNameFunct = "El nombre de la función es requerido");
-        (!formValues.descripcion  ) && (errorDescFunct = "La descripción de la función es requerido");
-        (!formValues.codigoFuncion) && (errorCodeFunct = "El código de la función es requerido");
-        (!formValues.idCategoria  ) && (errorCateFunct = "La categoría de la función es requerido");
-
-        if (errorNameFunct || errorDescFunct || errorCodeFunct || errorCateFunct) {
-            
-            setValidator({errorNameFunct, errorDescFunct, errorCodeFunct, errorCateFunct});
-            return true; 
-        };
-        return false;
-    }
 
     
-    const handleSubmit = ( e ) => {
+    const handleSubmit = async ( e ) => {
         e.preventDefault();
 
-        if(validate()){
-            return;
-            
-        }else{
+        try{ 
 
-            try {
-                const func = eval(`( ${formValues.codigoFuncion})`);                
-                if( typeof func !== 'function' ) throw new Error('No estás declarando una función');
-                
-            
-                fetch( `${BASEURL}function` ,  {
-                    method: 'POST',
-                    body: JSON.stringify(formValues),
-                    headers: {
-                        'Content-Type' : 'application/json',
-                        'x-token' : JSON.parse( localStorage.getItem('token') ) || ''   
-                    }
-                })
-                .then(data => data.json())
-                .then(( { code } ) => {
-                        if(code === 200){
-                            Swal.fire({
-                                text: `Funcion "${formValues.nombreFuncion}" creada.`,
-                                icon: 'success',
-                                timer: 2000,
-                                showConfirmButton: false
-                            });
-                            setValidator({});
-                            reset();
-                            return;
-                        }
-                })
-                .catch(console.warn);
+            const evalFunction = Function( formValues.codigoFuncion ); 
+            if ( typeof evalFunction !== 'function') throw new Error();
 
-            } catch (err) {
-                Swal.fire({
-                    title: 'Upps...',
-                    text : 'Errores sintácticos o no está declarando una función',
-                    icon : 'warning',
-                    timer: 1500,
-                    showConfirmButton: false
-                });    
-            }
+            const { code } = await postFunction({ formValues });
 
-        }
+            if( code !== 200 ) return;
 
+            swalAlert(`Función "${ formValues.nombreFuncion }" creada correctamente`, 'success')
+
+
+        }catch( evalErr ){
+
+            swalAlert('Errores sintácticos de la función o no estás declarando una!', 'warning')
+        }        
     };
 
     const handleModalSubmit = async ( e ) => {
-
+        
         e.preventDefault();
 
-        try{
-            let response = await fetch(  `${BASEURL}category` ,  {
-                method: 'POST',
-                body: JSON.stringify({nombreCategoria: e.target[0].value }),
-                headers: {
-                    'Content-Type' : 'application/json',
-                    'x-token' : JSON.parse( localStorage.getItem('token') ) || ''   
-                }
-            });
-
-            handleFetchModal( await response.json() );
-
-        }catch( err ){
-            console.log( err )
-        }
-    };
-
-    const handleFetchModal = ( {code, content = ''} ) => {
+        const { code, content  } =  await postNewCategory({ categoryName: e.target[0].value })
 
         if ( code !== 200 ){
-
-            Swal.fire({
-                icon: 'error',
-                text: content.errors[1],
-                timer: 1500,
-                showConfirmButton: false
-            });
+            swalAlert( content.errors[1], 'error' );
             return;
-        };
-        setCategorys([...categorys, content[0]]);
-        
-        // Categorías propias del usuario, se deben de devolver todas las del id correspondiente
+        }
+
+        setCategorys([
+            ...categorys,
+            content[0]
+        ]);
+
         setShow( !show )
+
     };
 
-
-    const handleShowModal = () => {
-        setShow( !show )
-    };
 
 
     return (
@@ -149,19 +78,16 @@ const NewFunctionScreen = () => {
             <NewCategory  
                 show = { show }
                 setShow = { setShow }
-                handleModalSubmit={ handleModalSubmit }
-                
-                
+                handleModalSubmit={ handleModalSubmit }           
             />
 
             <NewFunctionForm 
-                handleShowModal   = { handleShowModal   }
-                formValues        = { formValues        }
-                handleSubmit      = { handleSubmit      }
-                handleInputChange = { handleInputChange }
-                validator         = { validator         }
-                categorys         = { categorys         }
-                setCategorys      = { setCategorys      }
+                setShow             = { setShow }   
+                formValues          = { formValues        }
+                handleSubmit        = { handleSubmit      }
+                handleInputChange   = { handleInputChange }
+                categorys           = { categorys         }
+                setCategorys        = { setCategorys      }
             />
 
             </Card.Body>
