@@ -1,28 +1,28 @@
 import { Button }   from 'react-bootstrap'
-import React, { useEffect }        from 'react';
+import React, { useEffect } from 'react';
+import { getCategories } from './services/function';
 import '../styles/function.css';
 
 
-const BASEURL = 'http://localhost:8080/api/category';
-const NewFunctionForm = ({ formValues,handleInputChange,handleSubmit,handleShowModal, validator, categorys, setCategorys }) => {
+
+const NewFunctionForm = ({ formValues,handleInputChange,handleSubmit, setShow, categorys, setCategorys }) => {
 
     const { nombreFuncion, descripcion, codigoFuncion, idCategoria } = formValues;
-    
-    const getCategorys = () =>{
 
-        fetch(BASEURL, {method: 'get', headers: {'Content-Type' : 'application/json','x-token': JSON.parse(localStorage.getItem('token')) } })
-        .then( data => data.json())
-        .then( ({success, content =''}) => {
-            if(success === "1"){
-                setCategorys(content);
-            }
-        })
-        .catch( console.warn );
-    }
+    const getCats = async () => {
+        const { code, content } = await getCategories();
 
+        if ( code !== 200 ){
+            return;
+        }
+
+        setCategorys( content )
+
+    };
+  
     useEffect(() => {
-        getCategorys();
-    }, [])
+        getCats();
+    },[])
 
     return (
         <form className = "formFlex" onSubmit={ handleSubmit } autoComplete='off' >
@@ -34,13 +34,7 @@ const NewFunctionForm = ({ formValues,handleInputChange,handleSubmit,handleShowM
                         onChange={ handleInputChange }
                         value = { nombreFuncion }
                 />
-                {
-                    validator.errorNameFunct &&    
-                        <span className='text-danger'>
-                            <small> {validator.errorNameFunct} </small>
-                            <hr />
-                        </span>
-                }
+           
 
                 <label htmlFor="descripcion">Descripción</label>
                 <input  type="text" 
@@ -50,13 +44,7 @@ const NewFunctionForm = ({ formValues,handleInputChange,handleSubmit,handleShowM
                         onChange={ handleInputChange }
                         value = { descripcion }
                 />
-                {
-                    validator.errorDescFunct && 
-                        <span className='text-danger'>
-                            <small>{validator.errorDescFunct}</small>
-                            <hr />
-                        </span>
-                }
+            
 
                 <label htmlFor="idCategoria">Categoría</label>
 
@@ -71,13 +59,7 @@ const NewFunctionForm = ({ formValues,handleInputChange,handleSubmit,handleShowM
                     }
 
                 </select>
-                {
-                    validator.errorCateFunct && 
-                        <span className='text-danger'>
-                            <small>{validator.errorCateFunct}</small>
-                            <hr />
-                        </span>
-                }
+         
 
                 <label htmlFor="codigoFuncion">Código</label>
                 <textarea   name="codigoFuncion" 
@@ -87,16 +69,8 @@ const NewFunctionForm = ({ formValues,handleInputChange,handleSubmit,handleShowM
                             onChange={ handleInputChange }
                             value = { codigoFuncion }
                 />
-                {
-                    validator.errorCodeFunct && 
-                        <span className='text-danger'>
-                            <small>{validator.errorCodeFunct}</small>
-                            <hr />
-                        </span>
-                }
-
-
-                <Button variant="outline-success" type="button" onClick={ handleShowModal }> 
+    
+                <Button variant="outline-success" type="button" onClick={ setShow }> 
                     <i className="fa fa-plus"></i>
                 </Button>
 

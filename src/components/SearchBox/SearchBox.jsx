@@ -1,14 +1,11 @@
 import React from 'react';
 import { useForm } from '../../hooks/useForm'
+import { getQuerySearch } from '../services/searchBox';
 
 import '../../styles/searchBox.css'
 
-const URLBASE = 'http://localhost:8080/api/function';
 
 const SearchBox = ({ setFunctions }) => {
-
-
-
 
 
     const [ formValue, handleInputChange ] = useForm({
@@ -19,22 +16,16 @@ const SearchBox = ({ setFunctions }) => {
 
 
     const handleSubmit = async ( e ) => {
+
+        // Manejar un mensaje de error cuando no se encuentran coincidencias
         e.preventDefault();
 
-        let response = await fetch( `${ URLBASE }?search=${ search }`, {
-            headers: {
-                'x-token' : JSON.parse( localStorage.getItem('token') ) || ''
-            }
-        });
-        handleSearchFetch( await response.json() )
-    };
+        const data = await getQuerySearch( { search } ); 
 
-    const handleSearchFetch = ( data ) => {
-        if ( data.code === 200 ){
-            setFunctions(
-                data.content
-            )
+        if( data.code !== 200 ){
+            return;
         }
+        setFunctions( data.content ); 
     };
 
 
@@ -48,7 +39,7 @@ const SearchBox = ({ setFunctions }) => {
                 onChange={ handleInputChange }
                 required
         />
-</form>
+    </form>
 
   
 )};

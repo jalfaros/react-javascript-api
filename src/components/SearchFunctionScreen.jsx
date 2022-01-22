@@ -2,7 +2,7 @@ import React, {  useState } from 'react'
 import { Card } from 'react-bootstrap'
 import SearchBox from './SearchBox/SearchBox'
 import FunctionInfo from './SearchBox/FunctionInfo'
-import '../styles/search.css'
+
 
 
 

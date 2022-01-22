@@ -9,25 +9,19 @@ import SearchFunctionScreen from './SearchFunctionScreen'
 
 
 
-const HomeScreen = (  ) => {
-    
-    const { userName } = JSON.parse( localStorage.getItem( 'content' ))[0] || { }
+const HomeScreen = () => {
+  const { userName } = JSON.parse(localStorage.getItem("content"))[0] || {};
 
+  return (
+    <>
+      <NavBar username={userName} />
 
-    return (
-        <>
-            <NavBar username = { userName } />
-
-            <div className="boxContainer">
-                <NewFunctionScreen />
-                <SearchFunctionScreen />
-            </div>
-
-        
-            
-
-        </>
-    )
-}
+      <div className='boxContainer'>
+        <NewFunctionScreen />
+        <SearchFunctionScreen />
+      </div>
+    </>
+  );
+};
 
 export default HomeScreen
