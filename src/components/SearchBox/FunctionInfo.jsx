@@ -16,14 +16,13 @@ const FunctionInfo = ({ data }) => {
         setFnCode( null )
     }, [ data ])
 
-
-
   return (
 
     <Container className = "mt-4">
         <Table className= "table-striped table-bordered">
             <thead className= "text-center">
                 <tr>
+                    <td>Id</td>
                     <td>Creador</td>
                     <td>Categoría</td>
                     <td>Descripción</td>
@@ -35,6 +34,7 @@ const FunctionInfo = ({ data }) => {
                 {
                     data.map( ( { idFunction,userName, nameCategory, functionDescription, FunctionCode: fnCode } ) => {
                         return (<tr key = { idFunction }>
+                            <td>{ idFunction }</td>
                             <td>{ userName }</td>
                             <td>{ nameCategory }</td>
                             <td>{ functionDescription }</td>
